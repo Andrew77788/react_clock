@@ -18,7 +18,7 @@ class Clocks extends React.Component<{ name: string }, { time: string }> {
     this.timerId = window.setInterval(() => {
       this.setState({ time: new Date().toUTCString().slice(-12, -4) });
       // eslint-disable-next-line no-console
-      console.log(this.state.time);
+      console.log(new Date().toUTCString().slice(-12, -4));
     }, 1000);
   }
 
@@ -32,7 +32,7 @@ class Clocks extends React.Component<{ name: string }, { time: string }> {
   componentDidUpdate(prevProps: { name: string }) {
     if (prevProps.name !== this.props.name) {
       // eslint-disable-next-line no-console
-      console.log(`Renamed from ${prevProps.name} to ${this.props.name}`);
+      console.warn(`Renamed from ${prevProps.name} to ${this.props.name}`);
     }
   }
 
@@ -57,9 +57,11 @@ export class App extends React.Component {
 
   componentDidMount() {
     this.nameTimerId = window.setInterval(() => {
-      this.setState(() => ({
-        clockName: getRandomName(),
-      }));
+      if (this.state.hasClock) {
+        this.setState(() => ({
+          clockName: getRandomName(),
+        }));
+      }
     }, 3300);
 
     document.addEventListener('contextmenu', this.handleRightClick);
@@ -76,12 +78,13 @@ export class App extends React.Component {
     document.removeEventListener('click', this.handleLeftClick);
   }
 
-  handleRightClick = () => {
+  handleRightClick = (event: MouseEvent) => {
+    event.preventDefault();
     this.setState({ hasClock: false });
   };
 
   handleLeftClick = () => {
-    this.setState({ hasClock: true });
+    this.setState({hasClock: true});
   };
 
   render(): React.ReactNode {
